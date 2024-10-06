@@ -16,7 +16,7 @@ jobs:
     env:
       targetZip: horizon-eda-portable-${{ github.ref_name }}.zip
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: installer
         shell: cmd
