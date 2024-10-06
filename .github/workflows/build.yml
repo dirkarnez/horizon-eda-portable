@@ -33,8 +33,8 @@ jobs:
         run: |
           .\lessmsi\lessmsi.exe x "installer.msi" "horizon-installation\"
 
-      - shell: cmd
-        run: xcopy /H /Y /C "horizon-eda.exe.Portable.cmd" "horizon-installation\SourceDir\PFiles\Horizon EDA\bin"
+      # - shell: cmd
+      #   run: xcopy /H /Y /C "horizon-eda.exe.Portable.cmd" "horizon-installation\SourceDir\PFiles\Horizon EDA\bin"
 
       - shell: cmd
         run: |
