@@ -1,0 +1,53 @@
+name: portable-release-actions-workflow
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - 'c*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      
+jobs:
+  build:
+    name: Create Release
+    runs-on: windows-latest
+    env:
+      targetZip: horizon-eda-portable-${{ github.ref_name }}.zip
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: installer
+        shell: cmd
+        run: |
+          curl https://github.com/horizon-eda/horizon/releases/download/v2.6.0/horizon-eda-2.6.0-x64.msi -L --output installer.msi &&^
+          dir
+          
+      - name: lessmsi 
+        shell: cmd
+        run: | 
+          curl https://github.com/activescott/lessmsi/releases/download/v1.10.0/lessmsi-v1.10.0.zip -L --output lessmsi.zip && 7z.exe x lessmsi.zip -o"lessmsi"
+          
+      - shell: cmd
+        run: |
+          .\lessmsi\lessmsi.exe x "installer.msi" "horizon-installation\"
+
+      - shell: cmd
+        run: xcopy /H /Y /C "horizon-eda.exe.Portable.cmd" "horizon-installation\SourceDir\PFiles\Horizon EDA\bin"
+
+      - shell: cmd
+        run: |
+          cd "horizon-installation\SourceDir\PFiles" &&^
+          rename "Horizon EDA" "Horizon_EDA"
+          
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          directory: "horizon-installation/SourceDir/PFiles/Horizon_EDA"
+          filename: "${{ env.targetZip }}"
+          
+      - name: Release prebuilt
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "horizon-installation/SourceDir/PFiles/Horizon_EDA/${{ env.targetZip }}"
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
